@@ -1,0 +1,13 @@
+.container {
+    text-align: center;
+}
+
+.row {
+    margin-top: 10px;
+}
+
+#deleteBtn {
+    margin-left: 10px;
+}
+
+

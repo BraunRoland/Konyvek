@@ -1,6 +1,7 @@
-export interface Konyvek {
+export interface Konyvek  {
     id: number;
-    szerz: string;
+    cim: string;
+    szerzo: string;
     kiadasi_ev: number;
     mufaj: string;
     oldalszam: number;

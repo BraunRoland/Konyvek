@@ -1,12 +1,12 @@
 import type { Konyvek } from "../type/Konyvek"
 import { konyvekData } from "../data/konyvek"
-import { useState } from "react"
+import React, { useState } from "react"
 
 function Table() {
     const [konyvekAdat, setKonyvekAdat] = useState<Konyvek[]>(konyvekData);
     const [searched, setSearched] = useState<Konyvek[]>([]);
     const [name,setName] = useState<string>("");
-    const [key,setKey] = useState<keyof Konyvek | "">("");
+    const [key,setKey] = useState<keyof Konyvek>("cim" as keyof Konyvek);
     const [bool, setBool] = useState<boolean>(false)
 
     const [cim,setCim] = useState<string>("");
@@ -78,6 +78,52 @@ function Table() {
         }
     }
 
+    function Sort(e: React.MouseEvent<HTMLElement>) {
+        const thList = document.getElementsByTagName("th");
+        for (var th of thList) {
+            if (th.classList.contains("rendezett")) {
+                th.classList.remove("rendezett");
+                th.innerText = th.innerText
+                    .replace(" &#8593;", "")
+                    .replace(" &#8595;", "")
+                    .replace(" ↑", "")
+                    .replace(" ↓", "");
+            }
+        }
+
+        const alap: Konyvek[] = bool? [...searched]:[...konyvekAdat];
+        let rendezett: Konyvek[] = [];
+        const key = e.currentTarget.getAttribute('data-key');
+        e.currentTarget.classList.toggle("asc");
+        e.currentTarget.classList.toggle("rendezett");
+        if (e.currentTarget.classList.contains("asc")) {
+            if(key == "kiadasi_ev" || key == "oldalszam" || key == "elerheto") {
+                rendezett = alap.sort((a,b) => Number(a[key as keyof Konyvek])-Number(b[key as keyof Konyvek]));
+            }
+            else {
+                rendezett = alap.sort((a,b) => String(a[key as keyof Konyvek]).localeCompare(String(b[key as keyof Konyvek])));
+            }
+            e.currentTarget.innerHTML += " &#8593;";
+        }
+        else {
+            if(key == "kiadasi_ev" || key == "oldalszam" || key == "elerheto") {
+                rendezett = alap.sort((a,b) => Number(b[key as keyof Konyvek])-Number(a[key as keyof Konyvek]));
+            }
+            else {
+                rendezett = alap.sort((a,b) => String(b[key as keyof Konyvek]).localeCompare(String(a[key as keyof Konyvek])));
+            }
+            e.currentTarget.innerHTML += " &#8595;";
+        }
+
+        if (bool) {
+            setSearched(rendezett);
+        }
+        else {
+            setKonyvekAdat(rendezett);
+        }
+
+    }
+
     function Search() {
         setBool(true)
         if(name == "") {
@@ -109,7 +155,7 @@ function Table() {
                     }
                 })
             }
-            setSearched(lista);
+            setSearched([...lista]);
         }
     }
 
@@ -117,6 +163,7 @@ function Table() {
         setBool(false);
         setSearched([]);
     }
+
 
     return(
         <>
@@ -130,7 +177,7 @@ function Table() {
                 <div className="col-sm-6">
                     <label htmlFor="key" className="form-label">Mező:</label>
                     <select name="key" onChange={(e) => {setKey(e.target.value  as keyof Konyvek)}} className="form-select">
-                        <option value="cim" defaultChecked>Cím</option>
+                        <option value="cim">Cím</option>
                         <option value="szerzo">Szerző</option>
                         <option value="kiadasi_ev">Kiadási év</option>
                         <option value="mufaj">Múfaj</option>
@@ -153,14 +200,14 @@ function Table() {
                 <table className="table table-bordered">
                     <thead>
                         <tr>                            
-                            <th>Cím</th>
-                            <th>Szerző</th>
-                            <th>Kiadási év</th>
-                            <th>Műfaj</th>
-                            <th>Oldalszám</th>
-                            <th>Nyelv</th>
-                            <th>Értékelés</th>
-                            <th>Elérhető?</th>
+                            <th data-key="cim" onClick={(e) => Sort(e)}>Cím</th>
+                            <th data-key="szerzo" onClick={(e) => Sort(e)}>Szerző</th>
+                            <th data-key="kiadasi_ev" onClick={(e) => Sort(e)}>Kiadási év</th>
+                            <th data-key="mufaj" onClick={(e) => Sort(e)}>Műfaj</th>
+                            <th data-key="oldalszam" onClick={(e) => Sort(e)}>Oldalszám</th>
+                            <th data-key="nyelv" onClick={(e) => Sort(e)}>Nyelv</th>
+                            <th data-key="ertekeles" onClick={(e) => Sort(e)}>Értékelés</th>
+                            <th data-key="elerheto" onClick={(e) => Sort(e)}>Elérhető?</th>
                         </tr>
                     </thead>
                     <tbody>

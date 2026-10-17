@@ -1,5 +1,7 @@
 .container {
     text-align: center;
+    background-color: rgb(255, 252, 248);
+    border-radius: 4px;
 }
 
 .row {
@@ -11,9 +13,22 @@
 }
 
 .form {
-    background-color: rgb(189, 189, 189);
+    background-color: rgb(204, 204, 204);
     padding: 15px;
     border-radius: 4px;
 }
+
+th {
+    cursor: pointer;
+}
+
+.rendezett {
+    text-decoration: underline;
+}
+
+body {
+    background-color: rgb(230, 230, 230);
+}
+
 
 

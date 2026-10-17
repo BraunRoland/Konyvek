@@ -2,11 +2,82 @@ import type { Konyvek } from "../type/Konyvek"
 import { konyvekData } from "../data/konyvek"
 import { useState } from "react"
 
- function Table() {
+function Table() {
+    const [konyvekAdat, setKonyvekAdat] = useState<Konyvek[]>(konyvekData);
     const [searched, setSearched] = useState<Konyvek[]>([]);
     const [name,setName] = useState<string>("");
     const [key,setKey] = useState<keyof Konyvek | "">("");
     const [bool, setBool] = useState<boolean>(false)
+
+    const [cim,setCim] = useState<string>("");
+    const [szerzo, setSzerzo] = useState<string>("");
+    const [kiEv, setKiEv] = useState<number>(0);
+    const [mufaj, setMufaj] = useState<string>("");
+    const [oldalszam,setOldalszam] = useState<number>(0);
+    const [nyelv,setNyelv] = useState<string>("");
+    const [rating, setRating] = useState<number>(3);
+    const [elerheto, setElerheto] = useState<boolean>(false);
+    
+    function HandleSubmit(e: React.SubmitEvent<HTMLFormElement>) {
+        try{
+            e.preventDefault();
+            if (cim == "")
+            {
+                throw new Error("A cím nem lehet üres!");
+            }
+            else if (szerzo == "") {
+                throw new Error("A szerző nem lehet üres!");
+            }
+            else if (Number.isNaN(kiEv)) {
+                throw new Error("Adj meg egy érvényes számot kiadási évnek!");
+            }
+            else if (mufaj == "") {
+                throw new Error("A műfaj mező nem lehet üres!");
+            }
+            else if (Number.isNaN(oldalszam) || oldalszam <= 0) {
+                throw new Error("Adj meg egy érvényes számot oldalszámnak!");
+            }
+            else if (nyelv == "") {
+                throw new Error("A nyelv mező nem lehet üres!");
+            }
+            else if (Number.isNaN(rating) || rating < 1 || rating > 5) {
+                throw new Error("Adj meg egy érvényes számot az értékelésnek!");
+            }
+            else if (elerheto != true && elerheto != false) {
+                throw new Error("Elérhetőség értéke rossz!");
+            }
+            else {
+                const ujKonyv = {
+                    id: konyvekData.length+1,
+                    cim: cim,
+                    szerzo: szerzo,
+                    kiadasi_ev: kiEv,
+                    mufaj: mufaj,
+                    oldalszam: oldalszam,
+                    nyelv: nyelv,
+                    ertekeles: rating,
+                    elerheto: elerheto
+
+                };
+                setKonyvekAdat((meglevok) => [...meglevok,ujKonyv]);
+                setCim("");
+                setSzerzo("");
+                setKiEv(0);
+                setMufaj("");
+                setOldalszam(0);
+                setNyelv("");
+                setRating(3);
+                setElerheto(false);
+                console.log(konyvekData)
+            }
+        }
+        catch (err) {
+            if (err instanceof Error) {
+                alert(err.message);
+            }
+        }
+    }
+
     function Search() {
         setBool(true)
         if(name == "") {
@@ -24,14 +95,14 @@ import { useState } from "react"
                 else {
                     boolName = false
                 }
-                konyvekData.forEach(konyv=> {
+                konyvekAdat.forEach(konyv=> {
                     if(konyv.elerheto == boolName) {
                         lista.push(konyv)
                     }
                 })
             }
             else {
-                konyvekData.forEach(konyv => {
+                konyvekAdat.forEach(konyv => {
                     console.log(String(konyv[key as keyof Konyvek]).toLowerCase())
                     if (String(konyv[key as keyof Konyvek]).toLowerCase().includes(name.toLowerCase())) {
                         lista.push(konyv);
@@ -95,8 +166,8 @@ import { useState } from "react"
                     <tbody>
                         {
                             !bool?
-                            konyvekData.map(konyv => (
-                                <tr>
+                            konyvekAdat.map((konyv,index) => (
+                                <tr key={index}>
                                     <td>{konyv.cim}</td>
                                     <td>{konyv.szerzo}</td>
                                     <td>{konyv.kiadasi_ev}</td>
@@ -108,8 +179,8 @@ import { useState } from "react"
                                 </tr>
                             ))
                             :
-                            searched.map(konyv => (
-                                <tr>
+                            searched.map((konyv, index) => (
+                                <tr key={index}>
                                     <td>{konyv.cim}</td>
                                     <td>{konyv.szerzo}</td>
                                     <td>{konyv.kiadasi_ev}</td>
@@ -124,6 +195,57 @@ import { useState } from "react"
                     </tbody>
                 </table>
             </div>
+        </div>
+        <div className="form">
+            <div className="row form">
+                <div className="col-sm-12">
+                    <h3>Könyv hozzáadása</h3>
+                </div>
+            </div>
+            <form onSubmit={HandleSubmit}>
+                <div className="row">
+                    <div className="col-sm-4">
+                        <label htmlFor="cim" className="form-label">Cím:</label>
+                        <input type="text" value={cim} onChange={(e)=> {setCim(e.target.value)}} name="cim" className="form-control"/>
+                    </div>
+                    <div className="col-sm-4">
+                        <label htmlFor="szerzo" className="form-label">Szerző:</label>
+                        <input type="text" value={szerzo} onChange={(e) => {setSzerzo(e.target.value)}} name="szerző" className="form-control"/>
+                    </div>
+                    <div className="col-sm-4">
+                        <label htmlFor="kiEv" className="form-label">Kiadási év:</label>
+                        <input type="number" value={kiEv} onChange={(e) => {setKiEv(parseInt(e.target.value))}} name="kiEv" className="form-control" />
+                    </div>
+                </div>
+                <div className="row">
+                    <div className="col-sm-4">
+                        <label htmlFor="mufaj" className="form-label">Műfaj:</label>
+                        <input type="text" value={mufaj} onChange={(e) => {setMufaj(e.target.value)}} name="mufaj" className="form-control" />
+                    </div>
+                    <div className="col-sm-4">
+                        <label htmlFor="oldalszam" className="form-label">Oldalszám:</label>
+                        <input type="number" value={oldalszam} onChange={(e) => {setOldalszam(parseInt(e.target.value))}} name="oldalszam" className="form-control" />
+                    </div>
+                    <div className="col-sm-4">
+                        <label htmlFor="nyelv" className="form-label">Nyelv:</label>
+                        <input type="text" value={nyelv} onChange={(e) => {setNyelv(e.target.value)}} name="nyelv" className="form-control" />
+                    </div>
+                </div>
+                <div className="row">
+                    <div className="col-sm-6">
+                        <label htmlFor="ertekeles" className="form-label">Értékelés: {rating}</label>
+                        <input type="range" name="ertekeles" className="form-range" value={rating} onChange={(e) => (setRating(Number(e.target.value)))} min={1} max={5} step={0.1}/>
+                    </div>
+                    <div className="col-sm-6">
+                        <label htmlFor="elerheto" className="form-check-label">Elérhető?</label>
+                        <input type="checkbox" onChange={(e) => {
+                            setElerheto(e.target.checked);
+                            console.log(elerheto);
+                        }} name="elerheto" className="form-check-input" />
+                    </div>
+                </div>
+                <button type="submit" className="btn btn-success">Beküldés</button>
+            </form>
         </div>
         </>
     )

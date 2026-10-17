@@ -19,6 +19,7 @@ function Table() {
     const [elerheto, setElerheto] = useState<boolean>(false);
     
     function HandleSubmit(e: React.SubmitEvent<HTMLFormElement>) {
+        const alert = document.getElementById('alert') as HTMLDivElement;
         try{
             e.preventDefault();
             if (cim == "")
@@ -68,12 +69,22 @@ function Table() {
                 setNyelv("");
                 setRating(3);
                 setElerheto(false);
-                console.log(konyvekData)
+                if (alert.classList.contains('alert-danger')) {
+                    alert.classList.remove('alert-danger');
+                }
+                alert.classList.add('alert-success');
+                alert.innerHTML = `<strong>Siker!</strong>  a(z) ${cim} című könyv sikeresen hozzá lett adva!`;
+                alert.hidden = false;
             }
         }
         catch (err) {
             if (err instanceof Error) {
-                alert(err.message);
+                if (alert.classList.contains('alert-success')) {
+                    alert.classList.remove('alert-success');
+                }
+                alert.classList.add('alert-danger');
+                alert.innerHTML = `<strong>Hiba!</strong> `+err.message;
+                alert.hidden = false;
             }
         }
     }
@@ -162,6 +173,7 @@ function Table() {
     function Delete() {
         setBool(false);
         setSearched([]);
+        (document.getElementById('alert') as HTMLDivElement).hidden = true;
     }
 
 
@@ -293,6 +305,13 @@ function Table() {
                 </div>
                 <button type="submit" className="btn btn-success">Beküldés</button>
             </form>
+        </div>
+        <div className="row">
+            <div className="col-sm-12">
+                <div id="alert" className="alert" hidden>
+
+                </div>
+            </div>
         </div>
         </>
     )
